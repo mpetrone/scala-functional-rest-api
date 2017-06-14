@@ -1,2 +1,30 @@
-# scala-functional-api-rest
-Fuctional api rest in Scala with http4s, doobie and circe
+This is a example proyect for a fuctional api rest using:
+
+* http4s for the http endponts
+* doobie for Db
+* circe for json
+
+Motivation
+----------
+There are a few examples using the same libraries but neither of them
+solves the problems you may encounter in real life.
+This is how i resolved the struggles in building  a simple but extensible functional http endpoint with
+CRUD implementation.
+
+Run
+---
+
+Using [sbt-revolver] plugin we can have hot reloading for faster development
+
+Just run
+```
+sbt hot-run
+```
+
+Test
+----
+
+To run the tests just run
+```
+sbt test
+```
