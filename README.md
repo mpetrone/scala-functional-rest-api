@@ -14,7 +14,7 @@ CRUD implementation.
 Run
 ---
 
-Using [sbt-revolver] plugin we can have hot reloading for faster development
+Using [sbt-revolver](https://github.com/spray/sbt-revolver) plugin we can have hot reloading for faster development
 
 Just run
 ```
@@ -28,3 +28,9 @@ To run the tests just run
 ```
 sbt test
 ```
+
+Contributing
+-----
+
+Your contributions are always welcome! Please submit a pull request or
+create an issue if you see something wrong
