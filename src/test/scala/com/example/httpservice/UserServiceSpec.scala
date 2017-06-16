@@ -11,7 +11,7 @@ import org.http4s.circe._
 import org.scalatest.Matchers._
 import org.scalatest._
 
-class UserServiceSpec extends FunSuite {
+class UserServiceSpec extends CrudTestSuite {
 
   implicit val userEntityEncoder: EntityEncoder[User] = jsonEncoderOf[User]
   var users = Map.empty[String, User]
@@ -43,9 +43,9 @@ class UserServiceSpec extends FunSuite {
     val user2 = User("petro2", "petro2@mail.com", "123456")
     val user3 = User("petro3", "petro3@mail.com", "123456")
     users = Map(user1.id.toString -> user1, user2.id.toString -> user2, user3.id.toString -> user3)
-    val request = buildRequest(Method.GET, "/users")
-    val task = userHttpService.run(request)
-    val response = task.unsafeRun.orNotFound
+
+    val response = get(userHttpService, "/users")
+
     assert(response.status.code == 200)
     val body = getResponseBody(response)
     val parsedResponse = decode[List[User]](body)
@@ -59,9 +59,9 @@ class UserServiceSpec extends FunSuite {
   test("get a client") {
     val user = User("petro", "petro@mail.com", "123456")
     users = Map(user.id.toString -> user)
-    val request = buildRequest(Method.GET, s"/users/${user.id.toString}")
-    val task = userHttpService.run(request)
-    val response = task.unsafeRun.orNotFound
+
+    val response = get(userHttpService, s"/users/${user.id.toString}")
+
     assert(response.status.code == 200)
     val body = getResponseBody(response)
     val parsedResponse = decode[User](body)
@@ -70,49 +70,36 @@ class UserServiceSpec extends FunSuite {
   }
 
   test("get invalid client") {
-    val request = buildRequest(Method.GET, "/users/invalid-id")
-    val task = userHttpService.run(request)
-    val response = task.unsafeRun.orNotFound
+    val response = get(userHttpService, "/users/invalid-id")
     assert(response.status.code == 404)
   }
 
   test("insert client") {
     val user = User("petro", "petro@mail.com", "123456")
-    val request = buildRequest(Method.POST, "/users", Some(user.asJson))
-    val task = userHttpService.run(request)
-    val response = task.unsafeRun.orNotFound
+
+    val response = post(userHttpService, "/users", user.asJson)
+
     assert(response.status.code == 200)
     users.get(user.id.toString) should be (Some(user))
   }
 
   test("insert invalid client") {
     val invalidJson = parse("""{"dummy":"test"}""").right.get
-    val request = buildRequest(Method.POST, "/users", Some(invalidJson))
-    val task = userHttpService.run(request)
-    val response = task.unsafeRun.orNotFound
+
+    val response = post(userHttpService, "/users", invalidJson)
+
     assert(response.status.code == 400)
   }
 
   test("delete client") {
     val user = User("petro", "petro@mail.com", "123456")
     users = Map(user.id.toString -> user)
-    val request = buildRequest(Method.DELETE, s"/users/${user.id.toString}")
-    val task = userHttpService.run(request)
-    val response = task.unsafeRun.orNotFound
+
+    val response = delete(userHttpService, s"/users/${user.id.toString}")
+
     assert(response.status.code == 200)
     users.get(user.id.toString).map(_.deleted) should be (Some(true))
   }
 
-  private def buildRequest(method: Method, uri: String, bodyOpt: Option[Json] = None): Request = {
-    val uriString = Uri.fromString(uri)
-    assert(uriString.isRight)
-    val request = Request(method, uriString.right.get)
-    bodyOpt match {
-      case Some(body) => request.withBody(body).unsafeRun()
-      case None => request
-    }
-  }
 
-  private def getResponseBody(response: Response): String =
-    response.orNotFound.bodyAsText.runLog.unsafeRun.head
 }
