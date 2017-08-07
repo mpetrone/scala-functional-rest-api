@@ -2,41 +2,17 @@ package com.example.httpservice
 
 import com.example.dao.CrudDao
 import com.example.model.User
-import fs2.Task
-import io.circe.Json
 import io.circe.parser.{decode, _}
 import io.circe.syntax._
 import org.http4s._
 import org.http4s.circe._
 import org.scalatest.Matchers._
-import org.scalatest._
 
-class UserServiceSpec extends CrudTestSuite {
+class UserServiceSpec extends HttpTestSuite with testUserDao {
 
   implicit val userEntityEncoder: EntityEncoder[User] = jsonEncoderOf[User]
-  var users = Map.empty[String, User]
 
-  lazy val testDAO = new CrudDao[User] {
-    def getAll: Task[List[User]] = Task.now(users.values.toList)
-    def get(id: String): Task[Option[User]] = Task.now(users.get(id))
-    def insert(user: User): Task[String] = Task.now {
-      users = users + (user.id.toString -> user)
-      user.id.toString
-    }
-    def update(user: User): Task[String] = insert(user)
-    def delete(id: String): Task[Option[String]] = {
-      users.get(id) match {
-        case Some(user) =>
-          users = users + (user.id.toString -> user.delete)
-          Task.now(Some(user.id.toString))
-        case None => Task.now(None)
-      }
-    }
-  }
-
-  lazy val userHttpService: HttpService = new CrudHttpService[User] {
-    val dao: CrudDao[User] = testDAO
-  }.crudService("users")
+  lazy val userHttpService: HttpService = UserHttpService(userDaoTest).service
 
   test("get clients") {
     val user1 = User("petro1", "petro1@mail.com", "123456")

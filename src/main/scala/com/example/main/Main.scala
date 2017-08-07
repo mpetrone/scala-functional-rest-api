@@ -1,6 +1,6 @@
 package com.example.main
 
-import com.example.dao.UserDao
+import com.example.dao.UserDaoDb
 import com.example.httpservice.UserHttpService
 import doobie.imports.{DriverManagerTransactor, Transactor}
 import fs2.{Stream, Task}
@@ -10,7 +10,7 @@ import org.http4s.util.StreamApp
 object Main extends StreamApp {
   override def stream(args: List[String]): Stream[Task, Nothing] = {
 
-    val userDao = UserDao(DBConnection.xa)
+    val userDao = UserDaoDb(DBConnection.xa)
     val userHttpService = UserHttpService(userDao)
 
     BlazeBuilder

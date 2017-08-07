@@ -25,9 +25,11 @@ libraryDependencies ++= Seq(
   "io.circe"              %% "circe-java8"                % circeVersion,
   "org.scalatest"         %% "scalatest"                  % "3.0.1" % "test",
   "ch.qos.logback"         % "logback-classic"            % "1.2.3",
+  "org.slf4j"              % "slf4j-api"                  % "1.7.25",
   "org.tpolecat"          %% "doobie-core-cats"           % doobieVersion,
   "org.tpolecat"          %% "doobie-postgres-cats"       % doobieVersion,
-  "org.tpolecat"          %% "doobie-scalatest-cats"      % doobieVersion
+  "org.tpolecat"          %% "doobie-scalatest-cats"      % doobieVersion,
+  "org.reactormonk"       %% "cryptobits"                 % "1.1"
 )
 
 addCommandAlias("hot-run", "~re-start run")
